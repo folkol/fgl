@@ -1,4 +1,5 @@
-#include "fgl.h"
+#include "fgl/fgl.h"
+
 fgl::Game::Game() : running(true) {}
 bool fgl::Game::init() { return false; }
 bool fgl::Game::isRunning() { return running; }

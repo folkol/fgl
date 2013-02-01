@@ -1,13 +1,17 @@
 #ifndef FGL_H
 #define FGL_H
 
-class FGL {
-	bool running;
-public:
-	FGL() { running = true; }
-	bool isRunning() { return running; }
-	bool update() { running = false; }
-	bool render() { }
-};
+namespace fgl {
+	class Game {
+		bool running;
+	public:
+		Game();
+		bool init();
+		bool isRunning();
+		void update();
+		void render();
+		void stop();
+	};
+}
 
 #endif

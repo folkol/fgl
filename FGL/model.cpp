@@ -250,7 +250,7 @@ static int make_resources(void)
 	WCHAR strbuf[100];
 	GetCurrentDirectory(100, strbuf);
     g_resources.textures[0] = make_texture("resources\\gubbe.tga");
-    g_resources.textures[1] = make_texture("resources\\gubbe.tga");
+    g_resources.textures[1] = make_texture("resources\\gubbe2.tga");
 
     if (g_resources.textures[0] == 0 || g_resources.textures[1] == 0)
         return 0;
@@ -298,6 +298,10 @@ fgl::Model::Model(const char* name) {
 }
 
 void fgl::Model::draw() {
+	  static int milliseconds = 1000/60;
+	  milliseconds+=1000/60;
+    g_resources.fade_factor = sinf((float)milliseconds * 0.1f) * 0.5f + 0.5f;
+
 
 	 glUseProgram(g_resources.program);
 	 glUniform1f(g_resources.uniforms.fade_factor, g_resources.fade_factor);

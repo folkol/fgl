@@ -42,4 +42,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\gubbe.tga">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\gubbe2.tga">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

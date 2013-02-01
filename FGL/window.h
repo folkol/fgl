@@ -9,11 +9,16 @@ namespace fgl {
 
 	class Window {
 	HWND hWnd;
+	HDC hDC;
+	HGLRC hRC;
 
 	public:
 		Window();
 		bool init();
+		bool initOGL();
+		void disableOpenGL();
 		bool handleMessages();
+		void swapBuffers();
 	};
 
 }

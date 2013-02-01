@@ -1,11 +1,12 @@
 #include "window.h"
 
+#include "fgl.h"
+
 fgl::Window::Window() {
 }
 
 bool fgl::Window::init() {
 	static TCHAR szAppName[] = TEXT("Simple Window");
-	HWND hwnd;
 	WNDCLASS wndclass;
 
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -25,7 +26,7 @@ bool fgl::Window::init() {
 		return 0;
 	}
 
-	hwnd = CreateWindow(szAppName,
+	hWnd = CreateWindow(szAppName,
 		TEXT("Simple Application Window"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
@@ -37,10 +38,39 @@ bool fgl::Window::init() {
 		GetModuleHandle(NULL),
 		NULL);
 
-	ShowWindow(hwnd, SW_SHOWNORMAL);
-	UpdateWindow(hwnd);
+	initOGL();
+
+	ShowWindow(hWnd, SW_SHOWNORMAL);
+	UpdateWindow(hWnd);
 
 	return false;
+}
+
+bool fgl::Window::initOGL() {
+	hDC = GetDC( hWnd );
+	PIXELFORMATDESCRIPTOR pfd;
+	ZeroMemory( &pfd, sizeof( pfd ) );
+	pfd.nSize = sizeof( pfd );
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+	pfd.cDepthBits = 16;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+	int iFormat = ChoosePixelFormat( hDC, &pfd );
+	SetPixelFormat( hDC, iFormat, &pfd );
+
+	hRC = wglCreateContext( hDC );
+
+	wglMakeCurrent( hDC, hRC );
+
+	return true;
+}
+
+void fgl::Window::disableOpenGL() {
+    wglMakeCurrent( NULL, NULL );
+    wglDeleteContext( hRC );
+    ReleaseDC( hWnd, hDC );
 }
 
 bool fgl::Window::handleMessages() {
@@ -56,6 +86,10 @@ bool fgl::Window::handleMessages() {
 	}
 
     return true;
+}
+
+void fgl::Window::swapBuffers() {
+	SwapBuffers(hDC);
 }
 
 LRESULT CALLBACK fgl::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {

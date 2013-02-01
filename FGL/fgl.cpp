@@ -17,4 +17,9 @@ void fgl::Game::update() {
 }
 
 void fgl::Game::render() {}
+
+void fgl::Game::show() {
+	window->swapBuffers();
+}
+
 void fgl::Game::stop() { running = false; }

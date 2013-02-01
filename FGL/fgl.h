@@ -3,6 +3,9 @@
 
 #include "window.h"
 
+#define GLEW_STATIC
+#include <gl/glew.h>
+
 namespace fgl {
 
 	class Game {
@@ -14,6 +17,7 @@ namespace fgl {
 		bool isRunning();
 		void update();
 		void render();
+		void show();
 		void stop();
 	};
 

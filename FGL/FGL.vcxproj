@@ -80,11 +80,13 @@
   <ItemGroup>
     <ClCompile Include="fgl.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fgl.h" />
     <ClInclude Include="glew.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

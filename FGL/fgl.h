@@ -2,6 +2,7 @@
 #define FGL_H
 
 #include "window.h"
+#include "model.h"
 
 #define GLEW_STATIC
 #include <gl/glew.h>

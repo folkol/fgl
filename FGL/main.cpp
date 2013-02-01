@@ -2,14 +2,22 @@
 #include "fgl.h"
 
 class MyGame : public fgl::Game {
+	fgl::Model* model;
+
 public:
+	void init() {
+		fgl::Game::init();
+		model = new fgl::Model("test");
+	}
+
 	void update() {
 		fgl::Game::update();
 	}
 
 	void render() {
-		glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+		glClearColor(0.7f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		model->draw();
 	}
 };
 

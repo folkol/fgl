@@ -1,0 +1,1 @@
+Make sure you link with (static) glew32s.lib

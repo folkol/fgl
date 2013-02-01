@@ -64,6 +64,17 @@ bool fgl::Window::initOGL() {
 
 	wglMakeCurrent( hDC, hRC );
 
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+		glewGetString(err);
+		MessageBox(hWnd, L"GLEW init failed\n", L"NO GLEW", MB_OK);
+	}
+	if (!GLEW_VERSION_2_0) {
+		MessageBox(hWnd, L"OpenGL 2.0 not available\n", L"NO OGL", MB_OK);
+		return 1;
+	}
+
 	return true;
 }
 

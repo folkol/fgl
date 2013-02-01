@@ -3,8 +3,7 @@
 
 namespace fgl {
 	class Window {
-	public:
-		Window() {}
+		Window();
 	};
 }
 

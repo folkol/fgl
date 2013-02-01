@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\fgl">
-      <UniqueIdentifier>{e17b30c2-3732-4795-8e1b-6fb58bf542e0}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -29,11 +26,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fgl\fgl.h">
-      <Filter>Header Files\fgl</Filter>
-    </ClInclude>
     <ClInclude Include="window.h">
-      <Filter>Header Files\fgl</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fgl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

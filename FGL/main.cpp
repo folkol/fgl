@@ -4,7 +4,7 @@
 class MyGame : public fgl::Game {
 public:
 	void update() {
-		stop();
+		fgl::Game::update();
 	}
 };
 

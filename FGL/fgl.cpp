@@ -1,8 +1,20 @@
-#include "fgl/fgl.h"
+#include "fgl.h"
 
 fgl::Game::Game() : running(true) {}
-bool fgl::Game::init() { return false; }
-bool fgl::Game::isRunning() { return running; }
-void fgl::Game::update() { running = false; }
+
+bool fgl::Game::init() {
+	window = new Window();
+	window->init();
+	return true;
+}
+
+bool fgl::Game::isRunning() {
+	return running;
+}
+
+void fgl::Game::update() {
+	running = window->handleMessages();
+}
+
 void fgl::Game::render() {}
 void fgl::Game::stop() { running = false; }

@@ -294,4 +294,6 @@ void fgl::Model::draw() {
 		(void*)0            /* element array buffer offset */
 		);
 	glDisableVertexAttribArray(resources.attributes.position);
+
+
 }

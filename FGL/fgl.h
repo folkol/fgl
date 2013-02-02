@@ -14,7 +14,7 @@ namespace fgl {
 		bool running;
 	public:
 		Game();
-		bool init();
+		bool init(int x = 800, int y = 600);
 		bool isRunning();
 		void update();
 		void render();

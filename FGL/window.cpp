@@ -2,7 +2,9 @@
 
 #include "fgl.h"
 
-fgl::Window::Window() {
+fgl::Window::Window(int x, int y) {
+	this->width = x;
+	this->height = y;
 }
 
 bool fgl::Window::init() {
@@ -31,8 +33,8 @@ bool fgl::Window::init() {
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
+		width,
+		height,
 		NULL,
 		NULL,
 		GetModuleHandle(NULL),

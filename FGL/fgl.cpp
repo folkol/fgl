@@ -2,8 +2,8 @@
 
 fgl::Game::Game() : running(true) {}
 
-bool fgl::Game::init() {
-	window = new Window();
+bool fgl::Game::init(int x, int y) {
+	window = new Window(x, y);
 	window->init();
 	return true;
 }

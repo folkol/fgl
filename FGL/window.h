@@ -11,9 +11,10 @@ namespace fgl {
 	HWND hWnd;
 	HDC hDC;
 	HGLRC hRC;
+	int width, height;
 
 	public:
-		Window();
+		Window(int width = 800, int height = 600);
 		bool init();
 		bool initOGL();
 		void disableOpenGL();

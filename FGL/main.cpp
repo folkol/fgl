@@ -1,4 +1,5 @@
 #include <Windows.h>
+
 #include "fgl.h"
 
 class MyGame : public fgl::Game {

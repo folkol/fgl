@@ -1,18 +1,15 @@
 #include "model.h"
 
-#include <GL/glew.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <Windows.h>
 
-static void displayError(GLuint object, PFNGLGETSHADERIVPROC glGet__iv, PFNGLGETSHADERINFOLOGPROC glGet__InfoLog) {
+static void displayGLError(GLuint object, PFNGLGETSHADERIVPROC glGet__iv, PFNGLGETSHADERINFOLOGPROC glGet__InfoLog) {
 	GLint log_length;
 	char *log;
 
 	glGet__iv(object, GL_INFO_LOG_LENGTH, &log_length);
 	log = (char*) malloc(log_length);
 	glGet__InfoLog(object, log_length, NULL, log);
-
+	fprintf(stderr, log);
 	MessageBoxA(NULL, log, "Error", MB_OK);
 	free(log);
 }
@@ -118,24 +115,6 @@ void *read_tga(const char *filename, int *width, int *height) {
 			return pixels;
 }
 
-static struct {
-	GLuint vertex_buffer, element_buffer;
-	GLuint textures[2];
-
-	GLuint vertex_shader, fragment_shader, program;
-
-	struct {
-		GLint fade_factor;
-		GLint textures[2];
-	} uniforms;
-
-	struct {
-		GLint position;
-	} attributes;
-
-	GLfloat fade_factor;
-} g_resources;
-
 static GLuint make_shader(GLenum type, const char *filename) {
 	GLint length;
 	GLchar *source = (GLchar*) file_contents(filename, &length);
@@ -151,7 +130,7 @@ static GLuint make_shader(GLenum type, const char *filename) {
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
 	if (!shader_ok) {
 		fprintf(stderr, "Failed to compile %s:\n", filename);
-		displayError(shader, glGetShaderiv, glGetShaderInfoLog);
+		displayGLError(shader, glGetShaderiv, glGetShaderInfoLog);
 		glDeleteShader(shader);
 		return 0;
 	}
@@ -213,21 +192,21 @@ static GLuint make_program(GLuint vertex_shader, GLuint fragment_shader) {
 	glGetProgramiv(program, GL_LINK_STATUS, &program_ok);
 	if (!program_ok) {
 		fprintf(stderr, "Failed to link shader program:\n");
-		displayError(program, glGetProgramiv, glGetProgramInfoLog);
+		displayGLError(program, glGetProgramiv, glGetProgramInfoLog);
 		glDeleteProgram(program);
 		return 0;
 	}
 	return program;
 }
 
-static int make_resources(void)
+int fgl::Model::loadResources(void)
 {
-	g_resources.vertex_buffer = make_buffer(
+	resources.vertex_buffer = make_buffer(
 		GL_ARRAY_BUFFER,
 		g_vertex_buffer_data,
 		sizeof(g_vertex_buffer_data)
 		);
-	g_resources.element_buffer = make_buffer(
+	resources.element_buffer = make_buffer(
 		GL_ELEMENT_ARRAY_BUFFER,
 		g_element_buffer_data,
 		sizeof(g_element_buffer_data)
@@ -235,43 +214,43 @@ static int make_resources(void)
 
 	WCHAR strbuf[100];
 	GetCurrentDirectory(100, strbuf);
-	g_resources.textures[0] = make_texture("resources\\gubbe.tga");
-	g_resources.textures[1] = make_texture("resources\\gubbe2.tga");
+	resources.textures[0] = make_texture("resources\\gubbe.tga");
+	resources.textures[1] = make_texture("resources\\gubbe2.tga");
 
-	if (g_resources.textures[0] == 0 || g_resources.textures[1] == 0)
+	if (resources.textures[0] == 0 || resources.textures[1] == 0)
 		return 0;
 
 
-	g_resources.vertex_shader = make_shader(
+	resources.vertex_shader = make_shader(
 		GL_VERTEX_SHADER,
 		"resources\\vertex.glsl"
 		);
-	if (g_resources.vertex_shader == 0)
+	if (resources.vertex_shader == 0)
 		return 0;
 
-	g_resources.fragment_shader = make_shader(
+	resources.fragment_shader = make_shader(
 		GL_FRAGMENT_SHADER,
 		"resources\\fragment.glsl"
 		);
-	if (g_resources.fragment_shader == 0)
+	if (resources.fragment_shader == 0)
 		return 0;
 
-	g_resources.program = make_program(
-		g_resources.vertex_shader,
-		g_resources.fragment_shader
+	resources.program = make_program(
+		resources.vertex_shader,
+		resources.fragment_shader
 		);
-	if (g_resources.program == 0)
+	if (resources.program == 0)
 		return 0;
 
-	g_resources.uniforms.fade_factor
-		= glGetUniformLocation(g_resources.program, "fade_factor");
-	g_resources.uniforms.textures[0]
-	= glGetUniformLocation(g_resources.program, "textures[0]");
-	g_resources.uniforms.textures[1]
-	= glGetUniformLocation(g_resources.program, "textures[1]");
+	resources.uniforms.fade_factor
+		= glGetUniformLocation(resources.program, "fade_factor");
+	resources.uniforms.textures[0]
+	= glGetUniformLocation(resources.program, "textures[0]");
+	resources.uniforms.textures[1]
+	= glGetUniformLocation(resources.program, "textures[1]");
 
-	g_resources.attributes.position
-		= glGetAttribLocation(g_resources.program, "position");
+	resources.attributes.position
+		= glGetAttribLocation(resources.program, "position");
 
 	return 1;
 
@@ -279,43 +258,40 @@ static int make_resources(void)
 
 
 fgl::Model::Model(const char* name) {
-	make_resources();
+	loadResources();
 
 }
 
 void fgl::Model::draw() {
 	static int milliseconds = 1000/60;
 	milliseconds+=1000/60;
-	g_resources.fade_factor = sinf((float)milliseconds * 0.1f) * 0.5f + 0.5f;
+	resources.fade_factor = sinf((float)milliseconds * 0.01f) * 0.5f + 0.5f;
 
-
-	glUseProgram(g_resources.program);
-	glUniform1f(g_resources.uniforms.fade_factor, g_resources.fade_factor);
+	glUseProgram(resources.program);
+	glUniform1f(resources.uniforms.fade_factor, resources.fade_factor);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_resources.textures[0]);
-	glUniform1i(g_resources.uniforms.textures[0], 0);
+	glBindTexture(GL_TEXTURE_2D, resources.textures[0]);
+	glUniform1i(resources.uniforms.textures[0], 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_resources.textures[1]);
-	glUniform1i(g_resources.uniforms.textures[1], 1);
-	glBindBuffer(GL_ARRAY_BUFFER, g_resources.vertex_buffer);
+	glBindTexture(GL_TEXTURE_2D, resources.textures[1]);
+	glUniform1i(resources.uniforms.textures[1], 1);
+	glBindBuffer(GL_ARRAY_BUFFER, resources.vertex_buffer);
 	glVertexAttribPointer(
-		g_resources.attributes.position,  /* attribute */
+		resources.attributes.position,  /* attribute */
 		2,                                /* size */
 		GL_FLOAT,                         /* type */
 		GL_FALSE,                         /* normalized? */
 		sizeof(GLfloat)*2,                /* stride */
 		(void*)0                          /* array buffer offset */
 		);
-	glEnableVertexAttribArray(g_resources.attributes.position);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_resources.element_buffer);
+	glEnableVertexAttribArray(resources.attributes.position);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, resources.element_buffer);
 	glDrawElements(
 		GL_TRIANGLE_STRIP,  /* mode */
 		4,                  /* count */
 		GL_UNSIGNED_SHORT,  /* type */
 		(void*)0            /* element array buffer offset */
 		);
-	glDisableVertexAttribArray(g_resources.attributes.position);
-
-
+	glDisableVertexAttribArray(resources.attributes.position);
 }

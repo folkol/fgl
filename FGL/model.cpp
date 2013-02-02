@@ -5,19 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void show_info_log(
-    GLuint object,
-    PFNGLGETSHADERIVPROC glGet__iv,
-    PFNGLGETSHADERINFOLOGPROC glGet__InfoLog
-)
-{
+static void displayError(GLuint object, PFNGLGETSHADERIVPROC glGet__iv, PFNGLGETSHADERINFOLOGPROC glGet__InfoLog) {
     GLint log_length;
     char *log;
 
     glGet__iv(object, GL_INFO_LOG_LENGTH, &log_length);
     log = (char*) malloc(log_length);
     glGet__InfoLog(object, log_length, NULL, log);
-    fprintf(stderr, "%s", log);
+
+	MessageBoxA(NULL, log, "Error", MB_OK);
     free(log);
 }
 
@@ -159,7 +155,7 @@ shader = glCreateShader(type);
 	  glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
     if (!shader_ok) {
         fprintf(stderr, "Failed to compile %s:\n", filename);
-        show_info_log(shader, glGetShaderiv, glGetShaderInfoLog);
+        displayError(shader, glGetShaderiv, glGetShaderInfoLog);
         glDeleteShader(shader);
         return 0;
     }
@@ -227,7 +223,7 @@ static GLuint make_program(GLuint vertex_shader, GLuint fragment_shader)
 	 glGetProgramiv(program, GL_LINK_STATUS, &program_ok);
     if (!program_ok) {
         fprintf(stderr, "Failed to link shader program:\n");
-        show_info_log(program, glGetProgramiv, glGetProgramInfoLog);
+        displayError(program, glGetProgramiv, glGetProgramInfoLog);
         glDeleteProgram(program);
         return 0;
     }

@@ -90,10 +90,10 @@
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\fragment.glsl" />
-    <None Include="resources\gubbe.tga" />
-    <None Include="resources\gubbe2.tga" />
-    <None Include="resources\vertex.glsl" />
+    <None Include="resources\square_2d\fragment.glsl" />
+    <None Include="resources\square_2d\gubbe.tga" />
+    <None Include="resources\square_2d\gubbe2.tga" />
+    <None Include="resources\square_2d\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

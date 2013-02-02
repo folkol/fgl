@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include <Windows.h>
+#include <string>
 
 static void displayGLError(GLuint object, PFNGLGETSHADERIVPROC glGet__iv, PFNGLGETSHADERINFOLOGPROC glGet__InfoLog) {
 	GLint log_length;
@@ -199,7 +200,7 @@ static GLuint make_program(GLuint vertex_shader, GLuint fragment_shader) {
 	return program;
 }
 
-int fgl::Model::loadResources(void)
+int fgl::Model::loadResources(std::string name)
 {
 	resources.vertex_buffer = make_buffer(
 		GL_ARRAY_BUFFER,
@@ -214,8 +215,8 @@ int fgl::Model::loadResources(void)
 
 	WCHAR strbuf[100];
 	GetCurrentDirectory(100, strbuf);
-	resources.textures[0] = make_texture("resources\\gubbe.tga");
-	resources.textures[1] = make_texture("resources\\gubbe2.tga");
+	resources.textures[0] = make_texture((std::string("resources\\") + name + std::string("\\gubbe.tga")).c_str());
+	resources.textures[1] = make_texture((std::string("resources\\") + name + std::string("\\gubbe2.tga")).c_str());
 
 	if (resources.textures[0] == 0 || resources.textures[1] == 0)
 		return 0;
@@ -223,14 +224,14 @@ int fgl::Model::loadResources(void)
 
 	resources.vertex_shader = make_shader(
 		GL_VERTEX_SHADER,
-		"resources\\vertex.glsl"
+		(std::string("resources\\") + name + std::string("\\vertex.glsl")).c_str()
 		);
 	if (resources.vertex_shader == 0)
 		return 0;
 
 	resources.fragment_shader = make_shader(
 		GL_FRAGMENT_SHADER,
-		"resources\\fragment.glsl"
+		(std::string("resources\\") + name + std::string("\\fragment.glsl")).c_str()
 		);
 	if (resources.fragment_shader == 0)
 		return 0;
@@ -253,13 +254,10 @@ int fgl::Model::loadResources(void)
 		= glGetAttribLocation(resources.program, "position");
 
 	return 1;
-
 }
 
-
 fgl::Model::Model(const char* name) {
-	loadResources();
-
+	loadResources(name);
 }
 
 void fgl::Model::draw() {

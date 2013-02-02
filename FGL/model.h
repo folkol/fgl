@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 namespace fgl {
 
@@ -29,7 +30,7 @@ namespace fgl {
 			GLfloat fade_factor;
 		} resources;
 
-		int loadResources();
+		int loadResources(std::string name);
 	public:
 		Model(const char* name);
 		void draw();

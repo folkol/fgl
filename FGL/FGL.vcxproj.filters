@@ -43,16 +43,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\fragment.glsl">
+    <None Include="resources\square_2d\fragment.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\gubbe.tga">
+    <None Include="resources\square_2d\gubbe.tga">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\gubbe2.tga">
+    <None Include="resources\square_2d\gubbe2.tga">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\vertex.glsl">
+    <None Include="resources\square_2d\vertex.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

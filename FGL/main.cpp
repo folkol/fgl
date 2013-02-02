@@ -8,7 +8,7 @@ class MyGame : public fgl::Game {
 public:
 	void init() {
 		fgl::Game::init(400, 400);
-		model = new fgl::Model("test");
+		model = new fgl::Model("square_2d");
 	}
 
 	void update() {

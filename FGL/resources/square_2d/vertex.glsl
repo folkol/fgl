@@ -8,11 +8,15 @@ varying float fade_factor;
 
 void main()
 {
+	// Transforms that map worldspace to project space is 
+	// called projection matrix
 	mat3 window_scale = mat3(
         vec3(3.0/4.0, 0.0, 0.0),
         vec3(    0.0, 1.0, 0.0),
         vec3(    0.0, 0.0, 1.0)
     );
+	// Transforms to orient and place objects in world space
+	// Are called model-view matrices
 	mat3 rotation =
 		mat3(
 			vec3( cos(timer),  sin(timer),  0.0),

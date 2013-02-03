@@ -147,7 +147,7 @@ void *read_bmp(const std::string filename, int *width, int *height) {
 
 	size_t read;
 	std::vector<char> buffer;
-    std::ifstream file(filename);
+    std::ifstream file(filename, std::ios::in | std::ios::binary);
 
     if (file) {
         file.seekg(0,std::ios::end);
@@ -156,6 +156,8 @@ void *read_bmp(const std::string filename, int *width, int *height) {
 
         buffer.resize(length);
         file.read(&buffer[0],length);
+
+		std::streamsize bytes = file.gcount();
 
 		file.close();
     } else {
@@ -174,8 +176,9 @@ void *read_bmp(const std::string filename, int *width, int *height) {
 	short* pixel_size = (short*)&buffer[28]; 
 	int row_size = ((*pixel_size*(*width) + 31)/32)*4; // Row aligned on 4 bytes
 
+	char sample = buffer[400*3*200];
 	int pixels_size = *width * *height * 3;
-	char* pixels = (char*) malloc(pixels_size);
+	unsigned char* pixels = (unsigned char*) malloc(pixels_size);
 	for (int i = 0; i < *height; ++i) {
 		int pixel_pointer = i*(*width)*3;
 		int buffer_pointer = (*image_data_offset) + i * row_size;

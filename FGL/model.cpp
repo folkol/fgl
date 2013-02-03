@@ -234,6 +234,14 @@ static const GLfloat g_vertex_buffer_data[] = {
 	-1.0f,  1.0f,
 	1.0f,  1.0f
 };
+
+static const GLfloat g_vertex_buffer_data_3d[] = { 
+	-1.0f, -1.0f, 0.0f, 1.0f,
+	1.0f, -1.0f, 0.0f, 1.0f,
+	-1.0f,  1.0f, 0.0f, 1.0f,
+	1.0f,  1.0f, 0.0f, 1.0f
+};
+
 static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
 
@@ -294,8 +302,8 @@ int fgl::Model::loadResources(std::string name)
 {
 	resources.vertex_buffer = make_buffer(
 		GL_ARRAY_BUFFER,
-		g_vertex_buffer_data,
-		sizeof(g_vertex_buffer_data)
+		g_vertex_buffer_data_3d,
+		sizeof(g_vertex_buffer_data_3d)
 		);
 	resources.element_buffer = make_buffer(
 		GL_ELEMENT_ARRAY_BUFFER,
@@ -332,8 +340,8 @@ int fgl::Model::loadResources(std::string name)
 	if (resources.program == 0)
 		return 0;
 
-	resources.uniforms.fade_factor
-		= glGetUniformLocation(resources.program, "fade_factor");
+	resources.uniforms.timer
+		= glGetUniformLocation(resources.program, "timer");
 	resources.uniforms.textures[0]
 	= glGetUniformLocation(resources.program, "textures[0]");
 	resources.uniforms.textures[1]
@@ -352,10 +360,10 @@ fgl::Model::Model(const char* name) {
 void fgl::Model::draw() {
 	static int milliseconds = 1000/60;
 	milliseconds+=1000/60;
-	resources.fade_factor = sinf((float)milliseconds * 0.01f) * 0.5f + 0.5f;
+	resources.timer = (float)milliseconds * 0.001f;
 
 	glUseProgram(resources.program);
-	glUniform1f(resources.uniforms.fade_factor, resources.fade_factor);
+	glUniform1f(resources.uniforms.timer, resources.timer);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, resources.textures[0]);
 	glUniform1i(resources.uniforms.textures[0], 0);
@@ -366,10 +374,10 @@ void fgl::Model::draw() {
 	glBindBuffer(GL_ARRAY_BUFFER, resources.vertex_buffer);
 	glVertexAttribPointer(
 		resources.attributes.position,  /* attribute */
-		2,                                /* size */
+		4,                                /* size per vertex */
 		GL_FLOAT,                         /* type */
 		GL_FALSE,                         /* normalized? */
-		sizeof(GLfloat)*2,                /* stride */
+		sizeof(GLfloat)*4,                /* stride between vertices*/
 		(void*)0                          /* array buffer offset */
 		);
 	glEnableVertexAttribArray(resources.attributes.position);

@@ -19,7 +19,7 @@ namespace fgl {
 			GLuint vertex_shader, fragment_shader, program;
 
 			struct {
-				GLint fade_factor;
+				GLint timer;
 				GLint textures[2];
 			} uniforms;
 
@@ -27,7 +27,7 @@ namespace fgl {
 				GLint position;
 			} attributes;
 
-			GLfloat fade_factor;
+			GLfloat timer;
 		} resources;
 
 		int loadResources(std::string name);

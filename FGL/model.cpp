@@ -1,7 +1,10 @@
 #include "model.h"
 
 #include <Windows.h>
+#include <fstream>
 #include <string>
+#include <vector>
+
 
 static void displayGLError(GLuint object, PFNGLGETSHADERIVPROC glGet__iv, PFNGLGETSHADERINFOLOGPROC glGet__InfoLog) {
 	GLint log_length;
@@ -116,6 +119,78 @@ void *read_tga(const char *filename, int *width, int *height) {
 			return pixels;
 }
 
+void *read_bmp(const std::string filename, int *width, int *height) {
+	/*Offset   Length   Contents
+	0       2 bytes  "BM"
+	2       4 bytes  Total size included "BM" magic (s)
+	6       2 bytes  Reserved1
+	8       2 bytes  Reserved2
+	10      4 bytes  Offset bits
+	14      4 bytes  Header size (n)
+	18    n-4 bytes  Header (See bellow)
+	14+n .. s-1      Image data
+
+	(Header: n>12 (Microsoft Windows BMP image file))
+
+	Offset   Length   Contents
+	18      4 bytes  Width
+	22      4 bytes  Height
+	26      2 bytes  Planes
+	28      2 bytes  Bits per Pixel
+	30      4 bytes  Compression
+	34      4 bytes  Image size
+	38      4 bytes  X Pixels per meter
+	42      4 bytes  Y Pixels per meter
+	46      4 bytes  Number of Colors
+	50      4 bytes  Colors Important
+	54 (n-40) bytes  OS/2 new extentional fields??*/
+
+	size_t read;
+	std::vector<char> buffer;
+    std::ifstream file(filename);
+
+    if (file) {
+        file.seekg(0,std::ios::end);
+        std::streampos length = file.tellg();
+        file.seekg(0,std::ios::beg);
+
+        buffer.resize(length);
+        file.read(&buffer[0],length);
+
+		file.close();
+    } else {
+		fprintf(stderr, "Unable to open %s for reading\n", filename);
+		return NULL;
+	}
+
+	if(buffer[0] != 'B' || buffer[1] != 'M') {
+		fprintf(stderr, "Unexpected magic number in %s\n", filename);
+		return NULL;
+	}
+
+	width = (int*)&buffer[18];
+	height = (int*)&buffer[22];
+	int* image_data_offset = (int*)&buffer[10];
+	short* pixel_size = (short*)&buffer[28]; 
+	int row_size = ((*pixel_size*(*width) + 31)/32)*4; // Row aligned on 4 bytes
+
+	int pixels_size = *width * *height * 3;
+	char* pixels = (char*) malloc(pixels_size);
+	for (int i = 0; i < *height; ++i) {
+		int pixel_pointer = i*(*width);
+		int buffer_pointer = (*image_data_offset) + i * row_size;
+		for(int j = 0; j < *width; j++) {
+			// BGR order
+			pixels[pixel_pointer] = buffer[buffer_pointer + 2];
+			pixels[pixel_pointer + 1] = buffer[buffer_pointer + 1];
+			pixels[pixel_pointer + 2] = buffer[buffer_pointer];
+			pixel_pointer += 3;
+		}
+	}
+	
+	return (void*) pixels;
+}
+
 static GLuint make_shader(GLenum type, const char *filename) {
 	GLint length;
 	GLchar *source = (GLchar*) file_contents(filename, &length);
@@ -155,10 +230,18 @@ static const GLfloat g_vertex_buffer_data[] = {
 static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
 
-static GLuint make_texture(const char *filename) {
+static GLuint make_texture(const std::string filename) {
 	GLuint texture;
 	int width, height;
-	void *pixels = read_tga(filename, &width, &height);
+
+	void *pixels;
+
+	std::string suffix(".bmp");
+    if(0 == filename.compare (filename.length() - suffix.length(), suffix.length(), suffix)) {
+		pixels = read_bmp(filename.c_str(), &width, &height);
+    } else {
+        pixels = read_tga(filename.c_str(), &width, &height);
+    }
 
 	if (!pixels)
 		return 0;
@@ -216,7 +299,7 @@ int fgl::Model::loadResources(std::string name)
 	WCHAR strbuf[100];
 	GetCurrentDirectory(100, strbuf);
 	resources.textures[0] = make_texture((std::string("resources\\") + name + std::string("\\gubbe.tga")).c_str());
-	resources.textures[1] = make_texture((std::string("resources\\") + name + std::string("\\gubbe2.tga")).c_str());
+	resources.textures[1] = make_texture((std::string("resources\\") + name + std::string("\\gubbe2.bmp")).c_str());
 
 	if (resources.textures[0] == 0 || resources.textures[1] == 0)
 		return 0;

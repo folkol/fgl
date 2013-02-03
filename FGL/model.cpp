@@ -168,8 +168,8 @@ void *read_bmp(const std::string filename, int *width, int *height) {
 		return NULL;
 	}
 
-	width = (int*)&buffer[18];
-	height = (int*)&buffer[22];
+	*width = *(int*)&buffer[0x12];
+	*height = *(int*)&buffer[0x16];
 	int* image_data_offset = (int*)&buffer[10];
 	short* pixel_size = (short*)&buffer[28]; 
 	int row_size = ((*pixel_size*(*width) + 31)/32)*4; // Row aligned on 4 bytes
@@ -177,14 +177,18 @@ void *read_bmp(const std::string filename, int *width, int *height) {
 	int pixels_size = *width * *height * 3;
 	char* pixels = (char*) malloc(pixels_size);
 	for (int i = 0; i < *height; ++i) {
-		int pixel_pointer = i*(*width);
+		int pixel_pointer = i*(*width)*3;
 		int buffer_pointer = (*image_data_offset) + i * row_size;
 		for(int j = 0; j < *width; j++) {
-			// BGR order
-			pixels[pixel_pointer] = buffer[buffer_pointer + 2];
-			pixels[pixel_pointer + 1] = buffer[buffer_pointer + 1];
-			pixels[pixel_pointer + 2] = buffer[buffer_pointer];
+			// BGR order, but we handle that in the GL call to fill the texture object
+			unsigned char r = buffer[buffer_pointer];
+			unsigned char g = buffer[buffer_pointer + 1];
+			unsigned char b = buffer[buffer_pointer + 2];
+			pixels[pixel_pointer] = r;
+			pixels[pixel_pointer + 1] = g; 
+			pixels[pixel_pointer + 2] = b;
 			pixel_pointer += 3;
+			buffer_pointer += 3;
 		}
 	}
 	
@@ -299,11 +303,10 @@ int fgl::Model::loadResources(std::string name)
 	WCHAR strbuf[100];
 	GetCurrentDirectory(100, strbuf);
 	resources.textures[0] = make_texture((std::string("resources\\") + name + std::string("\\gubbe.tga")).c_str());
-	resources.textures[1] = make_texture((std::string("resources\\") + name + std::string("\\gubbe2.bmp")).c_str());
+	resources.textures[1] = make_texture((std::string("resources\\") + name + std::string("\\gubbe.bmp")).c_str());
 
 	if (resources.textures[0] == 0 || resources.textures[1] == 0)
 		return 0;
-
 
 	resources.vertex_shader = make_shader(
 		GL_VERTEX_SHADER,

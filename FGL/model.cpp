@@ -239,10 +239,14 @@ static const GLfloat g_vertex_buffer_data_3d[] = {
 	-1.0f, -1.0f, 0.0f, 1.0f,
 	1.0f, -1.0f, 0.0f, 1.0f,
 	-1.0f,  1.0f, 0.0f, 1.0f,
-	1.0f,  1.0f, 0.0f, 1.0f
+	1.0f,  1.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f, 1.0f,
+	-1.0f,  1.0f, 1.0f, 1.0f,
+	1.0f,  1.0f, 1.0f, 1.0f
 };
 
-static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
+static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
 
 static GLuint make_texture(const std::string filename) {
@@ -384,7 +388,7 @@ void fgl::Model::draw() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, resources.element_buffer);
 	glDrawElements(
 		GL_TRIANGLE_STRIP,  /* mode */
-		4,                  /* count */
+		8,                  /* count */
 		GL_UNSIGNED_SHORT,  /* type */
 		(void*)0            /* element array buffer offset */
 		);
